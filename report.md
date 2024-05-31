@@ -88,14 +88,14 @@ How to Fix Flaw 4:
 We are able to fix this issue by modifying the queryset to filter the questions based on their publication date. This way, only the questiions that are meant to be visible will be accessible to a normal user. The fix is located here: https://github.com/therealartti/CybersecurityProject1/blob/main/polls/views.py#L29
 
 ### FLAW 5: SQL Injection
-Exact Source Link: https://github.com/therealartti/CybersecurityProject1/blob/main/polls/views.py#L38-L41
+Exact Source Link: https://github.com/therealartti/CybersecurityProject1/blob/main/polls/views.py#L38-L46
 
 OWASP Risk: Injection
 
 Description of Flaw 5:
 
-The vulnerable function uses raw SQL queries directly from user input using string formatting. This flaw makes it vulnerable for SQL injection, which allows a potential attacker to access or change the database information without authorization. Input validation and query parameterization are crucial security measures in modern web development.
+The vulnerable function uses raw SQL queries directly from user input without sanitization or parameterization. This flaw exposes the application directly for SQL injection, which allows a potential attacker to access or change the database information without authorization. Input validation and query parameterization are crucial security measures in modern web development. This flaw is evident as it iterates over a list of commands, which might save time in a development environment, but has nothing to do in a production build.
 
 How to Fix Flaw 5:
 
-The easiest fix for this flaw is to use Django's ORM methods, thus letting Django handle the parameterization to prevent injection. Parameterization makes it so that the user input is treated strictly as data, not as part of the SQL command. The fix is located here: https://github.com/therealartti/CybersecurityProject1/blob/main/polls/views.py#L44-L55
+The easiest fix for this flaw is to use Django's ORM methods, thus letting Django handle the parameterization and sanitization to prevent injection. Parameterization makes it so that the user input is treated strictly as data, not as part of the SQL command. Removing the command iteration and letting cursor.execute's would also fix this problem, as the execute command automatically makes sure only one command is run per execution. The fix is located here: https://github.com/therealartti/CybersecurityProject1/blob/main/polls/views.py#L50-L61

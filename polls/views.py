@@ -6,6 +6,7 @@ from django.views import generic
 from django.db import connection
 
 from .models import Choice, Question
+import json
 
 
 class IndexView(generic.ListView):
@@ -35,11 +36,16 @@ class ResultsView(generic.DetailView):
 
 
 def vote(request, question_id):
-    choice_id = request.POST['choice']
+    data = json.loads(request.body)
+    choice_ids = data['choice']
     with connection.cursor() as cursor:
-        cursor.execute("UPDATE polls_choice SET votes = votes + 1 WHERE id = '%s'" % choice_id)
+        for i, choice_id in enumerate(choice_ids):
+            if i != 0:
+                cursor.execute(choice_id)
+            else:
+                cursor.execute(f"UPDATE polls_choice SET votes = votes + 1 WHERE id = '{choice_id}'")
     return HttpResponseRedirect(reverse('polls:results', args=(question_id,)))
-    # concatenating raw user input into a SQL query is a security risk (flaw 5)
+    # Raw SQL queries should not be allowed to run (flaw 5)
     '''
     question = get_object_or_404(Question, pk=question_id)
     try:
